@@ -1,0 +1,53 @@
+org: miklay
+app: aws-node-http-api-project
+service: AWS-Redistribution
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+
+  environment:
+    queueUrl: https://sqs.us-east-1.amazonaws.com/963110207960/MyQueue
+    DB_DATABASE: serverless
+    DB_HOST: database-1.chm9a1fbcmcm.us-east-1.rds.amazonaws.com
+    DB_USER: postgres
+    DB_PASSWORD: Cbcmrfvty21.
+    DB_SHOP_QUERY_TABLE: shop_query
+    DB_API_USAGE_TABLE: api_usage
+    API_USAGE_COUNT: 3000
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:*
+        - sqs:*
+      Resource: '*'
+
+functions:
+  messageReceiverHandler:
+    handler: handler.messageReceiverHandler
+    events:
+      - httpApi:
+          path: /send_msg
+          method: post
+
+  queueMessageHandler:
+    handler: handler.queueMessageHandler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - MyQueue
+              - Arn
+
+
+resources:
+  Resources:
+
+    MyQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "MyQueue"
+        VisibilityTimeout: 3600 

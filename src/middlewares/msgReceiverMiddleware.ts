@@ -17,11 +17,14 @@ export const msgReceiverMiddleware = (): middy.MiddlewareObj<
     const { userId, shopId, query } = JSON.parse(request.event.body!);
 
     // validating body
-    if (!userId || !shopId || !query) {
-      return createResponse(
-        "userId, shopId, query fields in body is required.",
-        400,
-      );
+    if (!userId) {
+      return createResponse("userId is required.", 400);
+    }
+    if (!shopId) {
+      return createResponse("shopId is required.", 400);
+    }
+    if (!query) {
+      return createResponse("query is required.", 400);
     }
 
     // checking shop_id

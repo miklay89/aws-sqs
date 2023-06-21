@@ -10,7 +10,7 @@ provider:
 
   environment:
     queueUrl: https://sqs.us-east-1.amazonaws.com/963110207960/MyQueue
-    DB_DATABASE: serverless
+    DB_DATABASE: postgres
     DB_HOST: database-1.chm9a1fbcmcm.us-east-1.rds.amazonaws.com
     DB_USER: postgres
     DB_PASSWORD: Cbcmrfvty21.

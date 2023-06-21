@@ -2,9 +2,9 @@
 import { APIGatewayEvent } from "aws-lambda";
 
 export type Body = {
-  userId: string;
-  shopId: string;
-  query: string;
+  userId: string | null | undefined;
+  shopId: string | null | undefined;
+  query: string | null | undefined;
 };
 
 export interface TypedRequest extends APIGatewayEvent {

@@ -1,20 +1,22 @@
 // eslint-disable-next-line import/no-unresolved
-import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyResult } from "aws-lambda";
 import middy from "@middy/core";
 import { Client } from "pg";
 import dbConfig from "../libs/db";
 import createResponse from "../helpers/createResponse";
 import shopIdChecker from "../helpers/shopIdChecker";
+import { Body, TypedRequest } from "./types";
 
 export const msgReceiverMiddleware = (): middy.MiddlewareObj<
-  APIGatewayEvent,
+  TypedRequest,
   APIGatewayProxyResult
 > => {
   const before: middy.MiddlewareFn<
-    APIGatewayEvent,
+    TypedRequest,
     APIGatewayProxyResult
   > = async (request) => {
-    const { userId, shopId, query } = JSON.parse(request.event.body!);
+    const messageBody: Body = JSON.parse(request.event.body);
+    const { userId, shopId, query } = messageBody;
 
     // validating body
     if (!userId) {
@@ -38,7 +40,7 @@ export const msgReceiverMiddleware = (): middy.MiddlewareObj<
     await client
       .connect()
       .catch((err) => console.log("Error connection - ", err.message));
-    const result = await client.query(queryString);
+    const result = await client.query<{ count: number }>(queryString);
     client.end();
 
     const apiUsageCount = +result.rows[0].count;
@@ -53,11 +55,11 @@ export const msgReceiverMiddleware = (): middy.MiddlewareObj<
     return;
   };
 
-  const after: middy.MiddlewareFn<
-    APIGatewayEvent,
-    APIGatewayProxyResult
-  > = async (request) => {
-    const { shopId } = JSON.parse(request.event.body!);
+  const after: middy.MiddlewareFn<TypedRequest, APIGatewayProxyResult> = async (
+    request,
+  ) => {
+    const messageBody: Body = JSON.parse(request.event.body);
+    const { shopId } = messageBody;
     const client = new Client(dbConfig);
     await client
       .connect()

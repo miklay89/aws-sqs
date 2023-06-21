@@ -1,17 +1,17 @@
 // eslint-disable-next-line import/no-unresolved
-import { Handler, APIGatewayEvent } from "aws-lambda";
+import { Handler } from "aws-lambda";
 import { SendMessageCommand } from "@aws-sdk/client-sqs";
 import middy from "@middy/core";
 import sqsClient from "../libs/sqs";
 import createResponse from "../helpers/createResponse";
 import msgReceiverMiddleware from "../middlewares/msgReceiverMiddleware";
-import { Body } from "./types";
+import { Body, TypedRequest } from "./types";
 
 const queueUrl = process.env.queueUrl as string;
 
-const handler: Handler = async (event: APIGatewayEvent) => {
+const handler: Handler = async (event: TypedRequest) => {
   try {
-    const messageBody: Body = JSON.parse(event.body!);
+    const messageBody: Body = JSON.parse(event.body);
 
     // send valid request to queue
     const params = {
